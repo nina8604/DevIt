@@ -28,9 +28,36 @@ function stripe_init_gateway_class() {
 		 * Constructor should define the following variables
 		 */
 		public function __construct() {
+			$ this -> id = 'Stripe' ; // payment gateway plugin ID
+			$ this -> icon = '' ; // URL of the icon that will be displayed on checkout page
+			$ this -> has_fields = true ; // if we need a custom credit card form
+			$ this -> method_title = 'Stripe Gateway' ;
+			$ this -> method_description = 'Описание платежного шлюза Stripe' ; // will be displayed on the options page
 
-			...
+			$ this -> support = array (
+						'products',
+					) ;
 
+			// Method with all the options fields
+			$ this -> init_form_fields ( ) ;
+
+			// Load the settings
+			$ this -> init_settings ( ) ;
+			$ this -> title = $ this -> get_option (  'title'  ) ;
+			$ this -> description = $ this -> get_option (  'description'  ) ;
+			$ this -> enabled = $ this -> get_option (  'enabled'  ) ;
+			$ this -> testmode = 'yes' === $ this ->get_option (  'testmode'  ) ;
+			$ this -> private_key = $ this -> testmode ? $ this -> get_option (  'test_private_key'  ) : $ this -> get_option (  'private_key'  ) ;
+			$ this -> publishable_key = $ this -> тестовый режим ? $ this -> get_option (  'test_publishable_key'  ) : $ this -> get_option ( 'publishable_key'  ) ;
+
+			// This action hook saves the settings
+			add_action (  'woocommerce_update_options_payment_gateways_' . $ this -> id , array (  $ this , 'process_admin_options'  )  ) ;
+
+			// JavaScript to obtain a token
+			add_action (  'wp_enqueue_scripts' , array (  $ this , 'payment_scripts'  )  ) ;
+
+			// You can also register a webhook here
+			//	add_action( 'woocommerce_api_{webhook name}', array( $this, 'webhook' ) );
 		}
 
 		/**
